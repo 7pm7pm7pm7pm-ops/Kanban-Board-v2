@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>หน้าคลัง — เตรียม Raw Material</title>
+<style>
+  :root {
+    --bg-page: #f4f3ee;
+    --bg-primary: #ffffff;
+    --bg-secondary: #eceae1;
+    --text-primary: #1a1a18;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #888780;
+    --text-danger: #a32d2d;
+    --text-success: #27500A;
+    --border-tertiary: rgba(0,0,0,0.12);
+    --border-secondary: rgba(0,0,0,0.22);
+    --border-info: #378add;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun", "Noto Sans Thai", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 14px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .top-zone { flex: 0 0 auto; }
+  .header-row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .header-row h1 { font-size: 18px; font-weight: 500; margin: 0; }
+  .header-row .sub { font-size: 12px; color: var(--text-secondary); margin: 0; }
+  .sync-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: #888; margin-right: 5px; vertical-align: middle;
+  }
+  .sync-on { background: var(--text-success); animation: pulse 2s infinite; }
+  .sync-off { background: var(--text-danger); }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+  .btn-back {
+    margin-left: auto;
+    background: #fff;
+    border: 2px solid #0c447c !important;
+    color: #0c447c !important;
+    font-weight: 500;
+    padding: 6px 14px !important;
+    height: auto !important;
+    font-size: 13px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .btn-back:hover { background: #0c447c !important; color: #fff !important; }
+  button { cursor: pointer; font-family: var(--font-sans); transition: background 0.12s, transform 0.05s; }
+  button:active { transform: scale(0.98); }
+
+  .info-bar {
+    background: var(--bg-secondary); border-radius: var(--radius-lg);
+    padding: 8px 12px; font-size: 12px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    display: inline-block; width: 12px; height: 12px;
+    border-radius: 50%; border: 1px solid rgba(0,0,0,0.3);
+  }
+  .lg-white  { background: #ffffff; }
+  .lg-yellow { background: #f5d000; border-color: #c4a300; }
+  .lg-green  { background: #4caf50; border-color: #2e7d32; }
+
+  .board-zone {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1.8fr 1fr;
+    gap: 10px;
+  }
+  .wh-col {
+    border-radius: var(--radius-lg); padding: 10px;
+    display: flex; flex-direction: column; min-height: 0;
+    border: 2px solid transparent;
+  }
+  .wh-white  { background: #fafafa; border-color: #d4d4d4; }
+  .wh-yellow { background: #fffbe6; border-color: #f5d000; }
+  .wh-green  { background: #f0f9f1; border-color: #4caf50; }
+
+  .wh-col-head {
+    flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px; padding: 0 2px;
+  }
+  .wh-col-head .title { font-size: 15px; font-weight: 500; }
+  .wh-col-head .count { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+  .wh-col-body { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding-right: 2px; }
+  .wh-col-body::-webkit-scrollbar { width: 8px; }
+  .wh-col-body::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+
+  .wh-mid { display: flex; flex-direction: column; min-height: 0; }
+  .wh-mid-top {
+    flex: 1 1 50%; min-height: 0;
+    display: flex; flex-direction: column;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(0,0,0,0.18);
+    margin-bottom: 10px;
+  }
+  .wh-mid-bottom {
+    flex: 1 1 50%; min-height: 0;
+    display: flex; flex-direction: column;
+  }
+  .wh-mid-bottom-head {
+    flex: 0 0 auto; font-size: 13px; font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px; padding: 0 2px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .wh-mid-bottom-body {
+    flex: 1 1 auto; overflow-y: auto; min-height: 0; padding-right: 2px;
+  }
+  .wh-mid-bottom-body::-webkit-scrollbar { width: 8px; }
+  .wh-mid-bottom-body::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+
+  /* การ์ดในคอลัมน์ */
+  .wh-card {
+    background: var(--bg-primary); border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md); padding: 9px 11px; margin-bottom: 6px; cursor: grab;
+  }
+  .wh-card .row1 { display: flex; justify-content: space-between; align-items: baseline; }
+  .wh-card .order-no { font-size: 13px; font-weight: 500; }
+  .wh-card .prod-badge {
+    font-size: 11px; padding: 2px 8px;
+    border-radius: var(--radius-md); font-weight: 500;
+  }
+  .wh-card .cust { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .wh-card .actions { margin-top: 6px; display: flex; gap: 5px; }
+  .wh-card button {
+    font-size: 11px; padding: 3px 9px;
+    border-radius: var(--radius-md); border: 0.5px solid var(--border-secondary);
+    background: var(--bg-primary); cursor: pointer;
+  }
+  .wh-card button:hover { background: var(--bg-secondary); }
+
+  /* การ์ดสรุป RM 3 ใบ St1/St2/St3 */
+  .rm-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .rm-st-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    display: flex; flex-direction: column;
+    min-height: 0;
+  }
+  .rm-st-card .st-head {
+    font-size: 13px; font-weight: 500;
+    color: var(--text-primary);
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .rm-st-card .st-tag {
+    display: inline-block;
+    background: #e3edf7; color: #0c447c;
+    font-size: 11px; font-weight: 500;
+    padding: 2px 7px; border-radius: var(--radius-md);
+  }
+  .rm-list { font-size: 12px; line-height: 1.7; }
+  .rm-row {
+    display: flex; justify-content: space-between;
+    padding: 2px 0;
+  }
+  .rm-row .rm-name { color: var(--text-secondary); }
+  .rm-row .rm-val { font-weight: 500; color: var(--text-primary); }
+  .rm-empty {
+    font-size: 12px; color: var(--text-tertiary);
+    text-align: center; padding: 8px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top-zone">
+    <div class="header-row">
+      <h1>📦 หน้าคลัง — เตรียม Raw Material</h1>
+      <p class="sub"><span class="sync-dot" id="sync-dot"></span><span id="sync-status">กำลังเชื่อมต่อ...</span></p>
+      <button class="btn-back" onclick="window.location.href='index.html'">← กลับหน้า Production</button>
+    </div>
+
+    <div class="info-bar">
+      <span style="font-weight:500;color:var(--text-primary);">สถานะคลัง:</span>
+      <span class="legend-item"><span class="legend-dot lg-white"></span> ขาว · ยังไม่เตรียม</span>
+      <span class="legend-item"><span class="legend-dot lg-yellow"></span> เหลือง · กำลังเตรียม</span>
+      <span class="legend-item"><span class="legend-dot lg-green"></span> เขียว · เตรียมเสร็จแล้ว</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--text-tertiary);">ลากการ์ดข้ามคอลัมน์เพื่อเปลี่ยนสถานะ</span>
+    </div>
+  </div>
+
+  <div class="board-zone">
+
+    <div class="wh-col wh-white" data-rm="white">
+      <div class="wh-col-head">
+        <span class="legend-dot lg-white"></span>
+        <span class="title">รอเตรียม</span>
+        <span class="count" id="cnt-white">0 ชิ้น</span>
+      </div>
+      <div class="wh-col-body" id="col-white"></div>
+    </div>
+
+    <div class="wh-col wh-yellow wh-mid" data-rm="yellow">
+
+      <div class="wh-mid-top">
+        <div class="wh-col-head">
+          <span class="legend-dot lg-yellow"></span>
+          <span class="title">กำลังเตรียม</span>
+          <span class="count" id="cnt-yellow">0 ชิ้น</span>
+        </div>
+        <div class="wh-col-body" id="col-yellow"></div>
+      </div>
+
+      <div class="wh-mid-bottom">
+        <div class="wh-mid-bottom-head">
+          <span>📋 ยอดรวม Raw Material ที่ต้องเตรียม</span>
+          <span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">รวมจากการ์ดในช่อง "กำลังเตรียม" ทั้งหมด</span>
+          <span id="rm-base" style="font-size:11px;font-weight:400;color:var(--text-tertiary);margin-left:auto;"></span>
+        </div>
+        <div class="wh-mid-bottom-body">
+          <div class="rm-summary-grid" id="rm-summary"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="wh-col wh-green" data-rm="green">
+      <div class="wh-col-head">
+        <span class="legend-dot lg-green"></span>
+        <span class="title">เตรียมเสร็จแล้ว</span>
+        <span class="count" id="cnt-green">0 ชิ้น</span>
+      </div>
+      <div class="wh-col-body" id="col-green"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBnMwKL9DqkpsIcZAUupgsGrLPcMs34GKQ",
+    authDomain: "kanban-board-24344.firebaseapp.com",
+    databaseURL: "https://kanban-board-24344-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "kanban-board-24344",
+    storageBucket: "kanban-board-24344.firebasestorage.app",
+    messagingSenderId: "342377964987",
+    appId: "1:342377964987:web:22a9d758287f62d303509e",
+    measurementId: "G-1PK0M4MCXC"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window.__fb = { db, ref, onValue, set };
+  window.dispatchEvent(new Event('fb-ready'));
+</script>
+
+<script>
+window.addEventListener('fb-ready', function(){
+  var fb = window.__fb;
+  var DB_PATH = 'kanban_v2';
+
+  var PROD = {
+    CAR:    {name:'รถ',     ramp:'c-blue'},
+    STORE:  {name:'ร้านค้า', ramp:'c-green'},
+    CAMERA: {name:'กล้อง',   ramp:'c-purple'}
+  };
+  var RAMP = {
+    'c-blue':   {bg:'#E6F1FB', tx:'#0C447C'},
+    'c-green':  {bg:'#EAF3DE', tx:'#27500A'},
+    'c-purple': {bg:'#EEEDFE', tx:'#3C3489'}
+  };
+  var PROD_STATUS = {
+    todo:  'รอผลิต',
+    doing: 'กำลังผลิต',
+    done:  'ผลิตเสร็จ'
+  };
+
+  /* BOM (Bill of Material) ต่อ 1 ชิ้น แยกตามสถานี
+     อ้างอิงข้อมูลจากภาพที่ผู้ใช้วาด
+     โครงสร้าง: PROD → St → { ชิ้นส่วน: จำนวน } */
+  var BOM = {
+    STORE: {
+      st1: {'สี่เหลี่ยม(จ)':2, 'ยาว':20, 'สั้น':20},
+      st2: {'สี่เหลี่ยม(ผ)':1, 'ยาว':6, 'กลาง':40},
+      st3: {'ยาว':2, 'กลาง':4}
+    },
+    CAR: {
+      st1: {'วงกลม(ญ)':2, 'วงกลม(ล)':2, 'ยาว':20},
+      st2: {'ยาว':24},
+      st3: {'ยาว':8, 'กลาง':4}
+    },
+    CAMERA: {
+      st1: {'ยาว':28, 'กลาง':24},
+      st2: {'สี่เหลี่ยม(จ)':2, 'ยาว':2, 'กลาง':20, 'สั้น':4},
+      st3: {'วงกลม(ญ)':4, 'ยาว':2}
+    }
+  };
+
+  var state = {orders:{}};
+
+  function pushState(){
+    fb.set(fb.ref(fb.db, DB_PATH), state).catch(function(err){
+      console.error('Firebase write error:', err);
+      document.getElementById('sync-status').textContent = 'เขียนไม่สำเร็จ';
+      document.getElementById('sync-dot').className = 'sync-dot sync-off';
+    });
+  }
+
+  function listenRemote(){
+    fb.onValue(fb.ref(fb.db, DB_PATH), function(snap){
+      var v = snap.val();
+      if(v){
+        state = v;
+        if(!state.orders) state.orders = {};
+        document.getElementById('sync-status').textContent = 'Sync แล้ว · ข้อมูลตรงกับหน้า Production';
+        document.getElementById('sync-dot').className = 'sync-dot sync-on';
+      } else {
+        state = {orders:{}};
+        document.getElementById('sync-status').textContent = 'ยังไม่มีออเดอร์ — รอข้อมูลจากหน้า Production';
+        document.getElementById('sync-dot').className = 'sync-dot sync-on';
+      }
+      render();
+    }, function(err){
+      console.error('Firebase read error:', err);
+      document.getElementById('sync-status').textContent = 'อ่านไม่สำเร็จ';
+      document.getElementById('sync-dot').className = 'sync-dot sync-off';
+    });
+  }
+
+  function ordersArr(){ return Object.keys(state.orders).map(function(k){ return state.orders[k]; }); }
+  function orderNo(n){ return 'Order ' + String(n).padStart(3,'0'); }
+
+  function cardHTML(o){
+    var p = PROD[o.prod];
+    var r = RAMP[p.ramp];
+    return '<div class="wh-card" draggable="true" data-id="'+o.id+'">'+
+      '<div class="row1">'+
+        '<span class="order-no">'+orderNo(o.seq)+'</span>'+
+        '<span class="prod-badge" style="background:'+r.bg+';color:'+r.tx+';">'+p.name+' '+o.unit+'</span>'+
+      '</div>'+
+      '<div class="cust">'+o.cust+' · '+(PROD_STATUS[o.col]||o.col)+'</div>'+
+      '<div class="actions">'+rmBtns(o)+'</div>'+
+    '</div>';
+  }
+
+  var RM_KEYS = ['white','yellow','green'];
+
+  function rmBtns(o){
+    var ci = RM_KEYS.indexOf(o.rm || 'white');
+    var out = '';
+    if(ci > 0) out += '<button data-rm-move="'+o.id+'" data-dir="-1">← ย้อน</button>';
+    if(ci < RM_KEYS.length-1) out += '<button data-rm-move="'+o.id+'" data-dir="1">ถัดไป →</button>';
+    return out;
+  }
+
+  /* คำนวณยอดรวม RM จากการ์ดที่อยู่ในช่อง "yellow" (กำลังเตรียม) */
+  function computeRMSummary(yellowCards){
+    var stTotals = { st1:{}, st2:{}, st3:{} };
+    var breakdownByProd = {}; // {CAR:n, STORE:n, CAMERA:n}
+
+    yellowCards.forEach(function(o){
+      var bom = BOM[o.prod];
+      if(!bom) return;
+      breakdownByProd[o.prod] = (breakdownByProd[o.prod]||0) + 1;
+      ['st1','st2','st3'].forEach(function(st){
+        var parts = bom[st] || {};
+        Object.keys(parts).forEach(function(name){
+          stTotals[st][name] = (stTotals[st][name]||0) + parts[name];
+        });
+      });
+    });
+
+    return {totals: stTotals, breakdown: breakdownByProd};
+  }
+
+  function renderRMSummary(yellowCards){
+    var summary = computeRMSummary(yellowCards);
+    var grid = document.getElementById('rm-summary');
+
+    // breakdown แสดง "อิงจาก: รถ 2 · ร้านค้า 1 · กล้อง 0"
+    var breakdownText = '';
+    if(yellowCards.length > 0){
+      var parts = ['CAR','STORE','CAMERA'].map(function(k){
+        return PROD[k].name + ' ' + (summary.breakdown[k]||0);
+      });
+      breakdownText = 'อิงจาก: ' + parts.join(' · ');
+    }
+    document.getElementById('rm-base').textContent = breakdownText;
+
+    var html = '';
+    ['st1','st2','st3'].forEach(function(st, idx){
+      var totals = summary.totals[st];
+      var keys = Object.keys(totals);
+      var inner = '';
+      if(yellowCards.length === 0 || keys.length === 0){
+        inner = '<div class="rm-empty">ยังไม่มีการ์ดในช่อง "กำลังเตรียม"</div>';
+      } else {
+        // เรียง: ตัวอักษรไทยขึ้นก่อน แล้วตามด้วยคำเต็ม (ยาว/กลาง/สั้น)
+        var SIZE_ORDER = {'ยาว':1, 'กลาง':2, 'สั้น':3};
+        keys.sort(function(a,b){
+          var aIsSize = a in SIZE_ORDER;
+          var bIsSize = b in SIZE_ORDER;
+          if(aIsSize !== bIsSize) return aIsSize ? 1 : -1;
+          if(aIsSize) return SIZE_ORDER[a] - SIZE_ORDER[b];
+          return a.localeCompare(b, 'th');
+        });
+        inner = '<div class="rm-list">' +
+          keys.map(function(k){
+            return '<div class="rm-row"><span class="rm-name">'+k+'</span><span class="rm-val">×'+totals[k]+'</span></div>';
+          }).join('') +
+        '</div>';
+      }
+      html += '<div class="rm-st-card">'+
+        '<div class="st-head"><span class="st-tag">St'+(idx+1)+'</span></div>'+
+        inner+
+      '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function render(){
+    var arr = ordersArr();
+    arr.sort(function(a,b){ return a.seq - b.seq; });
+
+    var yellowCards = [];
+    RM_KEYS.forEach(function(key){
+      var list = arr.filter(function(o){ return (o.rm||'white') === key; });
+      if(key === 'yellow') yellowCards = list;
+      document.getElementById('cnt-'+key).textContent = list.length + ' ชิ้น';
+      var el = document.getElementById('col-'+key);
+      if(list.length===0){
+        el.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);text-align:center;padding:20px 0;">ลากการ์ดมาวางที่นี่</div>';
+      } else {
+        el.innerHTML = list.map(cardHTML).join('');
+      }
+    });
+
+    renderRMSummary(yellowCards);
+    bindCards();
+  }
+
+  function bindCards(){
+    document.querySelectorAll('.wh-card').forEach(function(card){
+      card.addEventListener('dragstart', function(e){
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+        card.style.opacity = '0.4';
+      });
+      card.addEventListener('dragend', function(){ card.style.opacity='1'; });
+    });
+    document.querySelectorAll('.wh-col').forEach(function(col){
+      col.addEventListener('dragover', function(e){ e.preventDefault();
+        col.style.boxShadow = '0 0 0 3px var(--border-info) inset'; });
+      col.addEventListener('dragleave', function(){ col.style.boxShadow='none'; });
+      col.addEventListener('drop', function(e){
+        e.preventDefault(); col.style.boxShadow='none';
+        var id = e.dataTransfer.getData('text/plain');
+        var o = state.orders[id];
+        if(o){ o.rm = col.dataset.rm; pushState(); }
+      });
+    });
+    document.querySelectorAll('[data-rm-move]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var o = state.orders[b.dataset['rmMove']];
+        var ci = RM_KEYS.indexOf(o.rm || 'white');
+        var ni = ci + parseInt(b.dataset.dir,10);
+        if(ni>=0 && ni<RM_KEYS.length){ o.rm = RM_KEYS[ni]; pushState(); }
+      });
+    });
+  }
+
+  listenRemote();
+});
+</script>
+</body>
+</html>
